@@ -28,4 +28,6 @@ def solve_daily_repooling(pop, test_count):
     return greedy_repooling(pop, T, G)
 
 def compute_welfare(pool, pop):
-    return welfare(pool, pop)
+    alpha = app.config['ALPHA']
+    beta = app.config['BETA']
+    return welfare(pool, pop, alpha, beta)

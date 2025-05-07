@@ -71,17 +71,19 @@ def retrieve(m, x, T, C):
         pools.append(pool)
     return welfare, pools
 
-def welfare(pool, pop):
+def welfare(pool, pop, alpha, beta):
     """Compute the (expected) welfare of the given pool."""
-    return healthprob(pool, pop)*utilsum(pool, pop)
+    health_prob = healthprob(pool, pop, alpha, beta)
+    utility = utilsum(pool, pop)
+    return health_prob*utility
 
 def utilsum(pool, pop):
     """Compute the sum of the utilities pool."""
     return sum([pop[i][1] for i in pool])
 
-def healthprob(pool, pop):
+def healthprob(pool, pop, alpha, beta):
     """Compute the probability that the test result of the given pool is negative (i.e., healthy)."""
     healthprob = 1
     for i in pool:
         healthprob *= pop[i][0]
-    return healthprob
+    return (1 - alpha)*healthprob + beta*(1 - healthprob)

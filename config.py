@@ -49,6 +49,8 @@ class BaseConfig(object):
     BASELINE_SURVEY_DEADLINE = "7 January 2022"
     ENDLINE_SURVEY_OPENS = "1 February 2022"
     # Testing variables
+    ALPHA = 0.05
+    BETA = 0.05
     POOL_SIZE = 5
     MIN_DAILY_TESTS = 0
     MAX_DAILY_TESTS = 10
