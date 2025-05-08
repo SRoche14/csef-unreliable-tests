@@ -1,8 +1,11 @@
 import random
 import math
-from optimisation.python.models.conic_model import single_mosek
-from optimisation.python.models.approximation_model import approx_model
-from optimisation.python.utils import *
+# from optimisation.python.models.conic_model import single_mosek
+# from optimisation.python.models.approximation_model import approx_model
+# from optimisation.python.utils import *
+from models.conic_model import single_mosek
+from models.approximation_model import approx_model
+from utils import *
 
 # TODO: Only these imports work for running in Termial; only the ones above
 # work when running the web app locally. Figure out why this is. 
@@ -30,15 +33,16 @@ def greedy(pop, T, G=5):
     if not pop:
         return 0, {}
     pop = remove_zeros(pop)
-    welfares, pools = [], []
+    welfares_unreliable, welfares_reliable, pools = [], [], []
     for t in range(T):
-        w, pool = solve_conic(pop, G)
-        welfares.append(w) # record welfare
+        w_un, w_rel, pool = solve_conic(pop, G)
+        welfares_unreliable.append(w_un) # record welfare
+        welfares_reliable.append(w_rel)
         pools.append(pool) # record pool
         # Remove people in pool from population
         pop = {p: val for p, val in pop.items() if p not in pool}
     named_pools = { chr(65+i) : pool for i, pool in enumerate(pools) }
-    return sum(welfares), named_pools
+    return sum(welfares_unreliable), sum(welfares_reliable), named_pools
 
 def approximate(pop, T=1, G=5, K=17, upper=15):
         """
@@ -182,8 +186,10 @@ def solve_conic(pop, G):
     p = [[i+1 for i in range(len(q)) if x[i] == 1]]
     pool = [[keylist[i-1] for i in pool] for pool in p][0]
 
-    w = welfare(pool, pop)
-    return w, pool
+    ## CUSTOM TEST IMPLEMENTED - NON-STANDARD - hard coded alpha, beta parameters
+    w_unreliable = welfare(pool, pop, 0.10, 0)
+    w_reliable = welfare(pool, pop, 0, 0)
+    return w_unreliable, w_reliable, pool
 
 def initialise_allocations(weekly_pop, testing_days, daily_min, G, access_window):
     daily_allocations = { day : DailyAllocation(weekly_pop[day]) for day in testing_days }
